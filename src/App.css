@@ -1,0 +1,12 @@
+.App {
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+}
+.kottansWrapp{
+  width: 100%;
+  max-width: 800px;
+}
+.result_filterWrapp{
+  display: flex;
+}

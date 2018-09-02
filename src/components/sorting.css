@@ -1,0 +1,23 @@
+.sortingWrapp{
+  display: flex;
+  justify-content: center;
+  border: 1px solid #CCC;
+  padding: 5px 0 5px 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+.sorting--item{
+  margin-left: 20px;
+  color: #3333cf;
+  cursor: pointer;
+}
+.activeSort{
+  color: #000;
+}
+.sortIcon{
+  height: 15px;
+  display: none;
+}
+.activeSort .sortIcon{
+  display: inline;
+}
