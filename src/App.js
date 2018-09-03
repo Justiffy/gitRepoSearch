@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { InputGroup, Input, InputGroupAddon, Button } from 'reactstrap';
 import _ from 'lodash';
+import { Link } from 'react-router-dom';
 
 import './App.css';
 import { getMaxResult, searchUser } from './api/index.js';
@@ -22,6 +23,15 @@ class App extends Component {
     languageList: [],
     openAlert: false
   };
+
+  componentDidMount = () => {
+    const { match } = this.props;
+    if(match.params.repo) {
+      this.setState({
+        searchField: match.params.repo
+      }, () => this.startSearch())
+    }
+  }
 
   setSearchField = e => {
     const value = e.target.value.trim();
@@ -63,7 +73,6 @@ class App extends Component {
     const { searchField: user, sortOrder, activFilterLang, activeFilterStars, activeFilterForks } = this.state;
     const result = await searchUser(user, activFilterLang, activeFilterStars, activeFilterForks, page, sort, sortOrder);
 
-    console.log(result);
     this.setState({
       userList: result.data
     });
@@ -146,9 +155,11 @@ class App extends Component {
             <InputGroup>
               <Input placeholder="Repositories name" value={searchField} onChange={this.setSearchField} />
               <InputGroupAddon addonType="append">
-                <Button color="srcondary" onClick={this.startSearch}>
-                  Search
-                </Button>
+                <Link to={`/search/${searchField}`}>
+                  <Button color="srcondary" onClick={this.startSearch}>
+                    Search
+                  </Button>
+                </Link>
               </InputGroupAddon>
             </InputGroup>
           </div>
@@ -156,7 +167,11 @@ class App extends Component {
           <div className="kottan--resultFieldWrapp">
             <Sorting setSort={this.setSortParam} activSort={sortBy} sortOrder={sortOrder} userList={userList} />
             <div className="result_filterWrapp">
-              <ResultField activePage={activePage} pageChange={this.pageChange} userList={userList} />
+              <ResultField
+                activePage={activePage}
+                pageChange={this.pageChange}
+                userList={userList}
+              />
               <Filters
                 userList={userList}
                 languageList={this.state.languageList}

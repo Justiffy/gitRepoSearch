@@ -13,7 +13,6 @@ class resultField extends Component {
 
   render() {
     const { userList, activePage, pageChange } = this.props;
-          
     return (
       <div className="resultFieldWrapp">
         <div>
