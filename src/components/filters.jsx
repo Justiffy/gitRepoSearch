@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./filters.css";
+import "./Filters.css";
 
 const filters = props => {
   const {
@@ -11,30 +11,33 @@ const filters = props => {
     setFilterForks,
     userList
   } = props;
+
+  const languageListItems = languageList.map((el, index) => {
+    if (el === null) {
+      return null
+    } else {
+      return (
+        <div key={index}>
+          <input
+            type="radio"
+            name="language"
+            value={el}
+            onChange={setFilterLanguage}
+            checked={activFilterLang === el}
+          />
+          <span className="filterLanguage--item">{el}</span>
+        </div>
+      );
+    }
+  })
+
   return (
     <div>
       {userList.items ? (
         <div className="FiltersWrapp">
           <div className="filterLanguage">
             Language:
-            {languageList.map((el, index) => {
-              if (el === null) {
-                return null
-              } else {
-                return (
-                  <div key={index}>
-                    <input
-                      type="radio"
-                      name="language"
-                      value={el}
-                      onChange={setFilterLanguage}
-                      checked={activFilterLang === el}
-                    />
-                    <span className="filterLanguage--item">{el}</span>
-                  </div>
-                );
-              }
-            })}
+            {languageListItems}
           </div>
           <div className="filterStars">
             Stars:

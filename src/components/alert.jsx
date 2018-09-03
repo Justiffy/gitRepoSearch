@@ -1,9 +1,11 @@
 import React from 'react';
 import {Alert} from 'reactstrap'
 
+import './Alert.css';
+
 const alert = () => {
   return(
-    <div style={{marginTop: '10px'}}>
+    <div className="AlertMassage">
       <Alert color="danger" >
         API rate limit exceeded
       </Alert>

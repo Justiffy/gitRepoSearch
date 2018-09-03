@@ -1,13 +1,13 @@
-import React, { Component } from "react";
-import { InputGroup, Input, InputGroupAddon, Button } from "reactstrap";
-import axios from 'axios';
+import React, { Component } from 'react';
+import { InputGroup, Input, InputGroupAddon, Button } from 'reactstrap';
+import _ from 'lodash'
 
-import "./App.css";
-import ResultField from './components/resultField.jsx';
-import Sorting from './components/sorting.jsx';
-import Filters from './components/filters.jsx';
-import Alert from './components/alert.jsx';
-
+import './App.css';
+import { getMaxResult, searchUser } from './api/index.js';
+import ResultField from './components/ResultField';
+import Sorting from './components/Sorting';
+import Filters from './components/Filters';
+import Alert from './components/Alert.jsx';
 
 class App extends Component {
   state = {
@@ -21,162 +21,150 @@ class App extends Component {
     activeFilterForks: '',
     languageList: [],
     openAlert: false
-  }
+  };
 
-  debounce = (f, ms) => {
-    let timer = null;
-    
-      return function (...args) {
-        const onComplete = () => {
-          f.apply(this, args);
-          timer = null;
-        }
-    
-        if (timer) {
-          clearTimeout(timer);
-        }
-    
-        timer = setTimeout(onComplete, ms);
-      };
-  } 
-
-  deb = this.debounce((key, value) => {
-    this.setState({
-      [key]: value
-    }, () => this.searchUser())
-  }, 1000)
-
-  setSearchField = (e) => {
+  setSearchField = e => {
     const value = e.target.value.trim();
     this.setState({
       searchField: value
-    })
-  }
+    });
+  };
 
   startSearch = () => {
     this.setLanguageList();
+    this.setState(
+      {
+        activFilterLang: '',
+        activeFilterStars: '',
+        activeFilterForks: ''
+      },
+      () => this.searchUser()
+    );
+  };
+
+  setLanguageList = async () => {
+    const { searchField } = this.state;
+    const { data } = await getMaxResult(searchField);
+
+    const LanguageList = [];
+    data.items.forEach(el => {
+      const language = el.language;
+      if (LanguageList.includes(language)) {
+        return;
+      }
+      LanguageList.push(language);
+    });
     this.setState({
-      activFilterLang: '',
-      activeFilterStars: '',
-      activeFilterForks: '',
-    }, () => this.searchUser())
-  }
+      languageList: LanguageList
+    });
+  };
 
-  setLanguageList = () => {
-    const {searchField: user} = this.state;
-    axios.get(`https://api.github.com/search/repositories?q=${user}&per_page=100`)
-      .then( response => {
-        const {items: searchList} = response.data;
-        const LanguageList = [];
+  searchUser = async (page = 1, sort = '') => {
+    const { searchField: user, sortOrder, activFilterLang, activeFilterStars, activeFilterForks } = this.state;
+    const result = await searchUser(user, activFilterLang, activeFilterStars, activeFilterForks, page, sort, sortOrder);
 
-        searchList.forEach( el => {
-          const language = el.language;
-          if (LanguageList.includes(language)) {
-            return
-          }
-          LanguageList.push(language)
-        })
-
-        this.setState({
-          languageList: LanguageList
-        })
-      })
-      .catch(error => 
-        console.log(error)
-      );
-  }
-
-  searchUser = (page = 1, sort = '') => {
-    const {searchField: user, sortOrder, activFilterLang, activeFilterStars, activeFilterForks} = this.state;
-    axios.get(`https://api.github.com/search/repositories?q=${user}+${activFilterLang?'language:'+activFilterLang+'+':''}${activeFilterStars?'stars:>'+activeFilterStars+'+':''}${activeFilterForks?'forks:>'+activeFilterForks+'+':''}&per_page=5&page=${page}&sort=${sort}&order=${sortOrder}`)
-      .then( response => {
-        this.setState({
-          userList: response.data
-        })
-      })
-      .catch(error =>
-        this.getAlert()
-      )
-  }
+    console.log(result)
+    this.setState({
+      userList: result.data
+    });
+  };
 
   getAlert = () => {
-    const { openAlert } = this.state
+    const { openAlert } = this.state;
 
     if (openAlert) {
-      return
+      return;
     }
 
     this.setState({
-      openAlert: true,
-    })
+      openAlert: true
+    });
     setTimeout(() => {
       this.setState({
         openAlert: false
-      })
-    }, 4000)
-  }
+      });
+    }, 4000);
+  };
 
-  setSortParam = (name) => {
+  setSortParam = name => {
     this.setState({
       sortBy: name,
-      activePage: 0,
-    })
-    const order = (name === this.state.sortBy && this.state.sortOrder === 'desc') ? 'asc' : 'desc'
-    this.setState({
-      sortOrder: order
-    }, () => this.searchUser(1, name))
-  }
+      activePage: 0
+    });
+    const order = name === this.state.sortBy && this.state.sortOrder === 'desc' ? 'asc' : 'desc';
+    this.setState(
+      {
+        sortOrder: order
+      },
+      () => this.searchUser(1, name)
+    );
+  };
 
-  pageChange = (page) => {
-    const {sortBy} = this.state;
+  pageChange = page => {
+    const { sortBy } = this.state;
     this.setState({
       activePage: page
-    })
-    this.searchUser(page+1, sortBy);
-  }
+    });
+    this.searchUser(page + 1, sortBy);
+  };
 
-  setFilterLanguage = (event) => {
+  setFilterLanguage = event => {
     const value = event.target.value;
-    this.setState({
-      activFilterLang: value
-    }, () => this.searchUser())
-  }
+    this.setState(
+      {
+        activFilterLang: value
+      },
+      () => this.searchUser()
+    );
+  };
+  
+  debounced = _.debounce((key, value) => {
+    this.setState(
+      {
+        [key]: value
+      },
+      () => this.searchUser()
+    );
+  }, 1000);
 
-  setFilterStars = (event) => {
+  setFilterStars = event => {
     const value = event.target.value;
-    this.deb('activeFilterStars', value);
-  }
-  setFilterForks = (event) => {
-    const value = event.target.value;
-    this.deb('activeFilterForks', value);
-  }
+    this.debounced('activeFilterStars', value);
+  };
 
+  setFilterForks = event => {
+    const value = event.target.value;
+    this.debounced('activeFilterForks', value);
+  };
 
   render() {
-    const {openAlert, searchField, userList, activePage, sortBy, sortOrder, activFilterLang} = this.state;
+    const { openAlert, searchField, userList, activePage, sortBy, sortOrder, activFilterLang } = this.state;
     return (
       <div className="App">
         <div className="kottansWrapp">
           <div className="kottan--searchField">
             <InputGroup>
-              <Input placeholder="Repositories name" value={searchField} onChange={this.setSearchField}/>
+              <Input placeholder="Repositories name" value={searchField} onChange={this.setSearchField} />
               <InputGroupAddon addonType="append">
-                <Button color="srcondary" onClick={this.startSearch}>Search</Button>
+                <Button color="srcondary" onClick={this.startSearch}>
+                  Search
+                </Button>
               </InputGroupAddon>
-            </InputGroup>            
+            </InputGroup>
           </div>
           {openAlert ? <Alert /> : null}
           <div className="kottan--resultFieldWrapp">
-            <Sorting setSort={this.setSortParam} activSort={sortBy} sortOrder={sortOrder} userList={userList}/>
+            <Sorting setSort={this.setSortParam} activSort={sortBy} sortOrder={sortOrder} userList={userList} />
             <div className="result_filterWrapp">
               <ResultField activePage={activePage} pageChange={this.pageChange} userList={userList} />
               <Filters
                 userList={userList}
-                languageList={this.state.languageList} 
-                setFilterLanguage={this.setFilterLanguage} 
+                languageList={this.state.languageList}
+                setFilterLanguage={this.setFilterLanguage}
                 activFilterLang={activFilterLang}
                 setFilterStars={this.setFilterStars}
-                setFilterForks={this.setFilterForks} />
+                setFilterForks={this.setFilterForks}
+              />
             </div>
           </div>
         </div>

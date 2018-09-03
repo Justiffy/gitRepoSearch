@@ -5,14 +5,15 @@ import {
 } from "reactstrap";
 import ReactPaginate from "react-paginate";
 
-import "./resultField.css";
-import UserCard from "./userCard.jsx";
+import "./ResultField.css";
+import UserCard from "./UserCard";
 
 class resultField extends Component {
   state = {};
 
   render() {
     const { userList, activePage, pageChange } = this.props;
+          
     return (
       <div className="resultFieldWrapp">
         <div>

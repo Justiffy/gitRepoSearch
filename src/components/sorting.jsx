@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import './sorting.css';
+import './Sorting.css';
 import sortUp from '../img/sortUp.svg';
 import sortDown from '../img/sortDown.svg';
 

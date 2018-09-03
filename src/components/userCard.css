@@ -38,3 +38,6 @@
   display: flex;
   justify-content: space-around;
 }
+.userCard--text{
+  font-size: 0.8em;
+}

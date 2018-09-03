@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { ListGroupItem } from "reactstrap";
 
-import './userCard.css';
+import './UserCard.css';
 import Star from '../img/star.svg';
 
 const userCard = (props) => {
@@ -11,7 +11,7 @@ const userCard = (props) => {
     <ListGroupItem className="userCardWrapp">
       <div className="userCard--owner">
         <img src={userInfo.owner.avatar_url} alt="" className="userCard--avatar"/>
-        <p style={{fontSize: '0.8em'}}>{userInfo.owner.login}</p>
+        <p className="userCard--text">{userInfo.owner.login}</p>
       </div>
       <div className="userCard--repoInfo">
         <a href={userInfo.svn_url} target="_blank">{userInfo.name}</a>
@@ -26,12 +26,11 @@ const userCard = (props) => {
             <span className="userCard--repoInfo--fork">{userInfo.stargazers_count}</span>
           </div>
         </div>
-        <div style={{fontSize: '0.8em'}}>Last update: {moment(userInfo.updated_at).format("MMM Do YYYY")}</div>
-        <div style={{fontSize: '0.8em'}}>Language: {userInfo.language}</div>
+        <div className="userCard--text">Last update: {moment(userInfo.updated_at).format("MMM Do YYYY")}</div>
+        <div className="userCard--text">Language: {userInfo.language}</div>
       </div>
     </ListGroupItem>
   )
 }
-//userInfo.updated_at
 
 export default userCard;
