@@ -26,12 +26,15 @@ class App extends Component {
 
   componentDidMount = () => {
     const { match } = this.props;
-    if(match.params.repo) {
-      this.setState({
-        searchField: match.params.repo
-      }, () => this.startSearch())
+    if (match.params.repo) {
+      this.setState(
+        {
+          searchField: match.params.repo
+        },
+        () => this.startSearch()
+      );
     }
-  }
+  };
 
   setSearchField = e => {
     const value = e.target.value.trim();
@@ -40,7 +43,7 @@ class App extends Component {
     });
   };
 
-  startSearch = () => {
+  startSearch = () => {    
     this.setLanguageList();
     this.setState(
       {
@@ -146,6 +149,14 @@ class App extends Component {
     this.debounced('activeFilterForks', value);
   };
 
+  startSearchKey = e => {
+    if (e.key !== 'Enter') {
+      return;
+    }
+    this.props.history.push(`/search/${this.state.searchField}`);
+    this.startSearch();
+  }
+
   render() {
     const { openAlert, searchField, userList, activePage, sortBy, sortOrder, activFilterLang } = this.state;
     return (
@@ -153,7 +164,7 @@ class App extends Component {
         <div className="kottansWrapp">
           <div className="kottan--searchField">
             <InputGroup>
-              <Input placeholder="Repositories name" value={searchField} onChange={this.setSearchField} />
+              <Input onKeyPress={this.startSearchKey} placeholder="Repositories name" value={searchField} onChange={this.setSearchField} />
               <InputGroupAddon addonType="append">
                 <Link to={`/search/${searchField}`}>
                   <Button color="srcondary" onClick={this.startSearch}>
@@ -167,11 +178,7 @@ class App extends Component {
           <div className="kottan--resultFieldWrapp">
             <Sorting setSort={this.setSortParam} activSort={sortBy} sortOrder={sortOrder} userList={userList} />
             <div className="result_filterWrapp">
-              <ResultField
-                activePage={activePage}
-                pageChange={this.pageChange}
-                userList={userList}
-              />
+              <ResultField activePage={activePage} pageChange={this.pageChange} userList={userList} />
               <Filters
                 userList={userList}
                 languageList={this.state.languageList}
