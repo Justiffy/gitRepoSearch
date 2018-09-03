@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { InputGroup, Input, InputGroupAddon, Button } from 'reactstrap';
-import _ from 'lodash'
+import _ from 'lodash';
 
 import './App.css';
 import { getMaxResult, searchUser } from './api/index.js';
@@ -63,7 +63,7 @@ class App extends Component {
     const { searchField: user, sortOrder, activFilterLang, activeFilterStars, activeFilterForks } = this.state;
     const result = await searchUser(user, activFilterLang, activeFilterStars, activeFilterForks, page, sort, sortOrder);
 
-    console.log(result)
+    console.log(result);
     this.setState({
       userList: result.data
     });
@@ -117,7 +117,7 @@ class App extends Component {
       () => this.searchUser()
     );
   };
-  
+
   debounced = _.debounce((key, value) => {
     this.setState(
       {
